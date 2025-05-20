@@ -46,6 +46,7 @@ from termcolor import colored
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
 from gpt_engineer.applications.cli.file_selector import FileSelector
+from gpt_engineer.applications.gui.main import run as run_gui
 from gpt_engineer.core.ai import AI, ClipboardAI
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
@@ -378,6 +379,12 @@ def main(
         "--diff_timeout",
         help="Diff regexp timeout. Default: 3. Increase if regexp search timeouts.",
     ),
+    gui: bool = typer.Option(
+        False,
+        "--gui",
+        "-g",
+        help="Launch the graphical interface instead of running in the console.",
+    ),
 ):
     """
     The main entry point for the CLI tool that generates or improves a project.
@@ -422,6 +429,10 @@ def main(
         Run setup but to not call LLM or write any code. For testing purposes.
     sysinfo: bool
         Flag indicating whether to output system information for debugging.
+    diff_timeout: int
+        Timeout used when searching diffs in improve mode.
+    gui: bool
+        Launch the graphical interface instead of the CLI.
 
     Returns
     -------
@@ -437,6 +448,10 @@ def main(
         sys_info = get_system_info()
         for key, value in sys_info.items():
             print(f"{key}: {value}")
+        raise typer.Exit()
+
+    if gui:
+        run_gui(project_path)
         raise typer.Exit()
 
     # Validate arguments
