@@ -60,6 +60,13 @@ Improve Existing Code
 
     $ gpte projects/my-old-project -i
 
+Generate a Microservice
+----------------------
+
+- Write a prompt describing the desired API in a ``prompt`` file
+- Run ``gpte <project_dir> --microservice``
+- ``gpt-engineer`` will create ``app.py`` and ``Dockerfile`` in the folder
+
 By running ``gpt-engineer`` you agree to our `terms <./terms_link.html>`_.
 
 To **run in the browser** you can simply:

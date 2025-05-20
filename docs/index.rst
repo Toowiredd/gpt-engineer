@@ -8,6 +8,7 @@ Welcome to GPT-ENGINEER's Documentation
    introduction.md
    installation
    quickstart
+   microservice_generation
 
 .. toctree::
    :maxdepth: 2

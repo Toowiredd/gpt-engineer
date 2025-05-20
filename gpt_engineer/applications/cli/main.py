@@ -314,6 +314,11 @@ def main(
         "-sh",
         help="Self-heal mode - fix the code by itself when it fails.",
     ),
+    microservice: bool = typer.Option(
+        False,
+        "--microservice",
+        help="Generate a boilerplate microservice instead of using the LLM.",
+    ),
     azure_endpoint: str = typer.Option(
         "",
         "--azure",
@@ -409,6 +414,8 @@ def main(
         Flag indicating whether to discuss specifications with AI before implementation.
     self_heal_mode : bool
         Flag indicating whether to enable self-healing mode.
+    microservice : bool
+        Generate a boilerplate microservice instead of using the LLM.
     azure_endpoint : str
         The endpoint for Azure OpenAI services.
     use_custom_preprompts : bool
@@ -489,6 +496,15 @@ def main(
         image_directory,
         entrypoint_prompt_file,
     )
+
+    if microservice:
+        from gpt_engineer.applications.service_generator.api_automator import (
+            generate_microservice,
+        )
+
+        generate_microservice(path, prompt.text)
+        print(f"Microservice files created in {path}")
+        return
 
     # todo: if ai.vision is false and not llm_via_clipboard - ask if they would like to use gpt-4-vision-preview instead? If so recreate AI
     if not ai.vision:
