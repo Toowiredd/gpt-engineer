@@ -77,6 +77,7 @@ Generate a Microservice
 - Write a prompt describing the desired API in a ``prompt`` file
 - Run ``gpte <project_dir> --microservice``
 - ``gpt-engineer`` will create ``app.py`` and ``Dockerfile`` in the folder
+- If the prompt specifies ``port <number>`` the generated service will use that port
 
 
 By running ``gpt-engineer`` you agree to our `terms <./terms_link.html>`_.

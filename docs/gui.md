@@ -19,3 +19,4 @@ Capabilities
 - Toggle improve mode or standard generation.
 - Set model name and temperature.
 - Start and stop the run from the interface while monitoring logs.
+- Generate a boilerplate microservice via the **Generate Microservice** button.

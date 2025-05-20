@@ -4,11 +4,13 @@
 from __future__ import annotations
 
 import tkinter as tk
+from tkinter import filedialog, messagebox
 
 from pathlib import Path
 
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.gui.templates import TemplateManager
+from gpt_engineer.applications.service_generator.api_automator import generate_microservice
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.file_store import FileStore
@@ -49,6 +51,12 @@ class Application(tk.Tk):
         )
         self.generate_button.pack(pady=5)
 
+        tk.Button(
+            self,
+            text="Generate Microservice",
+            command=self.on_microservice_click,
+        ).pack(pady=5)
+
         self.status_var = tk.StringVar(value="Ready")
         tk.Label(self, textvariable=self.status_var).pack(pady=5)
         self.log = tk.Text(self, height=6, state="disabled")
@@ -71,6 +79,16 @@ class Application(tk.Tk):
         if template:
             self.prompt_entry.delete("1.0", tk.END)
             self.prompt_entry.insert(tk.END, template.content)
+
+    def on_microservice_click(self) -> None:
+        prompt = self.prompt_entry.get("1.0", tk.END).strip()
+        if not prompt:
+            messagebox.showerror("Error", "Prompt cannot be empty")
+            return
+        directory = filedialog.askdirectory(title="Select Output Directory")
+        if directory:
+            generate_microservice(Path(directory), prompt)
+            messagebox.showinfo("Done", f"Microservice generated in {directory}")
 
     def append_status(self, message: str) -> None:
         self.status_var.set(message)
