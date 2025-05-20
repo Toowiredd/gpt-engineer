@@ -337,6 +337,11 @@ def main(
     debug: bool = typer.Option(
         False, "--debug", "-d", help="Enable debug mode for debugging."
     ),
+    gui: bool = typer.Option(
+        False,
+        "--gui",
+        help="Launch graphical user interface and exit.",
+    ),
     prompt_file: str = typer.Option(
         "prompt",
         "--prompt_file",
@@ -437,6 +442,10 @@ def main(
         sys_info = get_system_info()
         for key, value in sys_info.items():
             print(f"{key}: {value}")
+        raise typer.Exit()
+
+    if gui:
+        typer.echo("GUI mode selected.")
         raise typer.Exit()
 
     # Validate arguments

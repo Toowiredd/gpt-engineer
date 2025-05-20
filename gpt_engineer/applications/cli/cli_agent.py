@@ -98,6 +98,16 @@ class CliAgent(BaseAgent):
         self.process_code_fn = process_code_fn
         self.improve_fn = improve_fn
         self.preprompts_holder = preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH)
+        self._update_callback: Optional[Callable[[str], None]] = None
+
+    def set_update_callback(self, callback: Callable[[str], None]) -> None:
+        """Register a callback for status updates."""
+
+        self._update_callback = callback
+
+    def _send_update(self, message: str) -> None:
+        if self._update_callback:
+            self._update_callback(message)
 
     @classmethod
     def with_default_config(
@@ -164,6 +174,8 @@ class CliAgent(BaseAgent):
             An instance of the `FilesDict` class containing the generated code.
         """
 
+        self._send_update("init_start")
+
         files_dict = self.code_gen_fn(
             self.ai, prompt, self.memory, self.preprompts_holder
         )
@@ -180,6 +192,7 @@ class CliAgent(BaseAgent):
             prompt=prompt,
             memory=self.memory,
         )
+        self._send_update("init_end")
         return files_dict
 
     def improve(
@@ -207,6 +220,8 @@ class CliAgent(BaseAgent):
             An instance of the `FilesDict` class containing the improved code.
         """
 
+        self._send_update("improve_start")
+
         files_dict = self.improve_fn(
             self.ai,
             prompt,
@@ -229,4 +244,5 @@ class CliAgent(BaseAgent):
         #     memory=self.memory,
         # )
 
+        self._send_update("improve_end")
         return files_dict
