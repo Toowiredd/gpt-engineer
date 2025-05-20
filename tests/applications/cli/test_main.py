@@ -176,6 +176,15 @@ class TestMain:
         )
         args()
 
+    def test_microservice_generation(self, tmp_path):
+        p = tmp_path / "service"
+        p.mkdir(parents=True)
+        (p / "prompt").write_text("return 'hi' at /hello")
+        args = DefaultArgumentsMain(str(p), llm_via_clipboard=True, microservice=True)
+        args()
+        assert (p / "app.py").exists()
+        assert (p / "Dockerfile").exists()
+
     def test_clarify_lite_improve_mode_generate_project(self, tmp_path, monkeypatch):
         p = tmp_path / "projects/example"
         p.mkdir(parents=True)
