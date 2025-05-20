@@ -148,6 +148,11 @@ class CliAgent(BaseAgent):
         CliAgent
             An instance of CliAgent configured with the provided or default parameters.
         """
+        if not isinstance(memory, DiskMemory):
+            raise TypeError("memory must be an instance of DiskMemory")
+        if not isinstance(execution_env, DiskExecutionEnv):
+            raise TypeError("execution_env must be an instance of DiskExecutionEnv")
+
         return cls(
             memory=memory,
             execution_env=execution_env,
