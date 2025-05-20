@@ -98,6 +98,15 @@ class CliAgent(BaseAgent):
         self.process_code_fn = process_code_fn
         self.improve_fn = improve_fn
         self.preprompts_holder = preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH)
+        self.update_callback: Callable[[str], None] | None = None
+
+    def set_update_callback(self, callback: Callable[[str], None]) -> None:
+        """Register a callback for status updates."""
+        self.update_callback = callback
+
+    def _notify(self, message: str) -> None:
+        if self.update_callback:
+            self.update_callback(message)
 
     @classmethod
     def with_default_config(
@@ -139,6 +148,11 @@ class CliAgent(BaseAgent):
         CliAgent
             An instance of CliAgent configured with the provided or default parameters.
         """
+        if not isinstance(memory, DiskMemory):
+            raise TypeError("memory must be an instance of DiskMemory")
+        if not isinstance(execution_env, DiskExecutionEnv):
+            raise TypeError("execution_env must be an instance of DiskExecutionEnv")
+
         return cls(
             memory=memory,
             execution_env=execution_env,
@@ -164,6 +178,7 @@ class CliAgent(BaseAgent):
             An instance of the `FilesDict` class containing the generated code.
         """
 
+        self._notify("Generating code...")
         files_dict = self.code_gen_fn(
             self.ai, prompt, self.memory, self.preprompts_holder
         )
@@ -180,6 +195,7 @@ class CliAgent(BaseAgent):
             prompt=prompt,
             memory=self.memory,
         )
+        self._notify("Generation complete")
         return files_dict
 
     def improve(
@@ -207,6 +223,7 @@ class CliAgent(BaseAgent):
             An instance of the `FilesDict` class containing the improved code.
         """
 
+        self._notify("Improving code...")
         files_dict = self.improve_fn(
             self.ai,
             prompt,
@@ -229,4 +246,5 @@ class CliAgent(BaseAgent):
         #     memory=self.memory,
         # )
 
+        self._notify("Improvement complete")
         return files_dict

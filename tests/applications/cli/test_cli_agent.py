@@ -150,5 +150,12 @@ def test_improve_standard_config(monkeypatch):
     assert code[outfile] == "!dlroW olleH"
 
 
+def test_with_default_config_validates_types(tmp_path):
+    with pytest.raises(TypeError):
+        CliAgent.with_default_config("foo", DiskExecutionEnv())
+    with pytest.raises(TypeError):
+        CliAgent.with_default_config(DiskMemory(tmp_path), "bar")
+
+
 if __name__ == "__main__":
     pytest.main()

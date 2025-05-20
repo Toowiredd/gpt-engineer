@@ -46,6 +46,7 @@ from termcolor import colored
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
 from gpt_engineer.applications.cli.file_selector import FileSelector
+from gpt_engineer.applications.gui.main import run as run_gui
 from gpt_engineer.core.ai import AI, ClipboardAI
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
@@ -313,6 +314,11 @@ def main(
         "-sh",
         help="Self-heal mode - fix the code by itself when it fails.",
     ),
+    microservice: bool = typer.Option(
+        False,
+        "--microservice",
+        help="Generate a boilerplate microservice instead of using the LLM.",
+    ),
     azure_endpoint: str = typer.Option(
         "",
         "--azure",
@@ -378,6 +384,12 @@ def main(
         "--diff_timeout",
         help="Diff regexp timeout. Default: 3. Increase if regexp search timeouts.",
     ),
+    gui: bool = typer.Option(
+        False,
+        "--gui",
+        "-g",
+        help="Launch the graphical interface instead of running in the console.",
+    ),
 ):
     """
     The main entry point for the CLI tool that generates or improves a project.
@@ -402,6 +414,8 @@ def main(
         Flag indicating whether to discuss specifications with AI before implementation.
     self_heal_mode : bool
         Flag indicating whether to enable self-healing mode.
+    microservice : bool
+        Generate a boilerplate microservice instead of using the LLM.
     azure_endpoint : str
         The endpoint for Azure OpenAI services.
     use_custom_preprompts : bool
@@ -422,6 +436,10 @@ def main(
         Run setup but to not call LLM or write any code. For testing purposes.
     sysinfo: bool
         Flag indicating whether to output system information for debugging.
+    diff_timeout: int
+        Timeout used when searching diffs in improve mode.
+    gui: bool
+        Launch the graphical interface instead of the CLI.
 
     Returns
     -------
@@ -437,6 +455,10 @@ def main(
         sys_info = get_system_info()
         for key, value in sys_info.items():
             print(f"{key}: {value}")
+        raise typer.Exit()
+
+    if gui:
+        run_gui(project_path)
         raise typer.Exit()
 
     # Validate arguments
@@ -474,6 +496,15 @@ def main(
         image_directory,
         entrypoint_prompt_file,
     )
+
+    if microservice:
+        from gpt_engineer.applications.service_generator.api_automator import (
+            generate_microservice,
+        )
+
+        generate_microservice(path, prompt.text)
+        print(f"Microservice files created in {path}")
+        return
 
     # todo: if ai.vision is false and not llm_via_clipboard - ask if they would like to use gpt-4-vision-preview instead? If so recreate AI
     if not ai.vision:

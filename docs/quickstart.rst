@@ -71,6 +71,14 @@ You can start ``gpt-engineer`` with a simple windowed interface by adding the ``
 
 The GUI lets you edit the prompt, pick a model and start generation without using the terminal.
 
+Generate a Microservice
+----------------------
+
+- Write a prompt describing the desired API in a ``prompt`` file
+- Run ``gpte <project_dir> --microservice``
+- ``gpt-engineer`` will create ``app.py`` and ``Dockerfile`` in the folder
+
+
 By running ``gpt-engineer`` you agree to our `terms <./terms_link.html>`_.
 
 To **run in the browser** you can simply:
