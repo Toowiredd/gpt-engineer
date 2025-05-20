@@ -58,12 +58,17 @@ Check the [Windows README](./WINDOWS_README.md) for Windows usage.
 - Run `gpte <project_dir> -i` with a relative path to your folder
   - For example: `gpte projects/my-old-project -i` from the gpt-engineer directory root with your folder in `projects/`
 
+### Launch the GUI
+- Prepare your project folder as above with a `prompt` file
+- Run `gpte <project_dir> --gui`
+  - This opens a simple window where you can edit the prompt, adjust model settings and start generation
+
 ### Generate a microservice
 
 - Create a folder with a `prompt` describing the API
 - Run `gpte <project_dir> --microservice`
 - The command writes a `Dockerfile`, `app.py` and `requirements.txt` into the directory
-
+- 
 ### Benchmark custom agents
 - gpt-engineer installs the binary 'bench', which gives you a simple interface for benchmarking your own agent implementations against popular public datasets.
 - The easiest way to get started with benchmarking is by checking out the [template](https://github.com/gpt-engineer-org/gpte-bench-template) repo, which contains detailed instructions and an agent template.
