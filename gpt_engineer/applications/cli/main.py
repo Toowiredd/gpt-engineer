@@ -14,10 +14,6 @@ Main Functionality
 - Parse user-specified parameters for project configuration and AI behavior.
 - Facilitate interaction with AI models, databases, and archival processes.
 
-Parameters
-----------
-None
-
 Notes
 -----
 - The `OPENAI_API_KEY` must be set in the environment or provided in a `.env` file within the working directory.
@@ -70,14 +66,6 @@ app = typer.Typer(
 
 
 def load_env_if_needed():
-    """
-    Load environment variables if the OPENAI_API_KEY is not already set.
-
-    This function checks if the OPENAI_API_KEY environment variable is set,
-    and if not, it attempts to load it from a .env file in the current working
-    directory. It then sets the openai.api_key for use in the application.
-    """
-    # We have all these checks for legacy reasons...
     if os.getenv("OPENAI_API_KEY") is None:
         load_dotenv()
     if os.getenv("OPENAI_API_KEY") is None:
@@ -92,14 +80,9 @@ def load_env_if_needed():
 
 
 def concatenate_paths(base_path, sub_path):
-    # Compute the relative path from base_path to sub_path
     relative_path = os.path.relpath(sub_path, base_path)
-
-    # If the relative path is not in the parent directory, use the original sub_path
     if not relative_path.startswith(".."):
         return sub_path
-
-    # Otherwise, concatenate base_path and sub_path
     return os.path.normpath(os.path.join(base_path, sub_path))
 
 
@@ -110,22 +93,6 @@ def load_prompt(
     image_directory: str,
     entrypoint_prompt_file: str = "",
 ) -> Prompt:
-    """
-    Load or request a prompt from the user based on the mode.
-
-    Parameters
-    ----------
-    input_repo : DiskMemory
-        The disk memory object where prompts and other data are stored.
-    improve_mode : bool
-        Flag indicating whether the application is in improve mode.
-
-    Returns
-    -------
-    str
-        The loaded or inputted prompt.
-    """
-
     if os.path.isdir(prompt_file):
         raise ValueError(
             f"The path to the prompt, {prompt_file}, already exists as a directory. No prompt can be read from it. Please specify a prompt file using --prompt_file"
@@ -150,7 +117,6 @@ def load_prompt(
         )
         if os.path.isfile(full_entrypoint_prompt_file):
             entrypoint_prompt = input_repo.get(full_entrypoint_prompt_file)
-
         else:
             raise ValueError("The provided file at --entrypoint-prompt does not exist")
 
@@ -172,21 +138,6 @@ def load_prompt(
 
 
 def get_preprompts_path(use_custom_preprompts: bool, input_path: Path) -> Path:
-    """
-    Get the path to the preprompts, using custom ones if specified.
-
-    Parameters
-    ----------
-    use_custom_preprompts : bool
-        Flag indicating whether to use custom preprompts.
-    input_path : Path
-        The path to the project directory.
-
-    Returns
-    -------
-    Path
-        The path to the directory containing the preprompts.
-    """
     original_preprompts_path = PREPROMPTS_PATH
     if not use_custom_preprompts:
         return original_preprompts_path
@@ -205,13 +156,10 @@ def compare(f1: FilesDict, f2: FilesDict):
     def colored_diff(s1, s2):
         lines1 = s1.splitlines()
         lines2 = s2.splitlines()
-
         diff = difflib.unified_diff(lines1, lines2, lineterm="")
-
         RED = "\033[38;5;202m"
         GREEN = "\033[92m"
         RESET = "\033[0m"
-
         colored_lines = []
         for line in diff:
             if line.startswith("+"):
@@ -220,7 +168,6 @@ def compare(f1: FilesDict, f2: FilesDict):
                 colored_lines.append(RED + line + RESET)
             else:
                 colored_lines.append(line)
-
         return "\n".join(colored_lines)
 
     for file in sorted(set(f1) | set(f2)):
@@ -343,6 +290,12 @@ def main(
     debug: bool = typer.Option(
         False, "--debug", "-d", help="Enable debug mode for debugging."
     ),
+    gui: bool = typer.Option(
+        False,
+        "--gui",
+        "-g",
+        help="Launch the graphical interface instead of running in the console.",
+    ),
     prompt_file: str = typer.Option(
         "prompt",
         "--prompt_file",
@@ -384,71 +337,9 @@ def main(
         "--diff_timeout",
         help="Diff regexp timeout. Default: 3. Increase if regexp search timeouts.",
     ),
-    gui: bool = typer.Option(
-        False,
-        "--gui",
-        "-g",
-        help="Launch the graphical interface instead of running in the console.",
-    ),
 ):
-    """
-    The main entry point for the CLI tool that generates or improves a project.
-
-    This function sets up the CLI tool, loads environment variables, initializes
-    the AI, and processes the user's request to generate or improve a project
-    based on the provided arguments.
-
-    Parameters
-    ----------
-    project_path : str
-        The file path to the project directory.
-    model : str
-        The model ID string for the AI.
-    temperature : float
-        The temperature setting for the AI's responses.
-    improve_mode : bool
-        Flag indicating whether to improve an existing project.
-    lite_mode : bool
-        Flag indicating whether to run in lite mode.
-    clarify_mode : bool
-        Flag indicating whether to discuss specifications with AI before implementation.
-    self_heal_mode : bool
-        Flag indicating whether to enable self-healing mode.
-    microservice : bool
-        Generate a boilerplate microservice instead of using the LLM.
-    azure_endpoint : str
-        The endpoint for Azure OpenAI services.
-    use_custom_preprompts : bool
-        Flag indicating whether to use custom preprompts.
-    prompt_file : str
-        Relative path to a text file containing a prompt.
-    entrypoint_prompt_file: str
-        Relative path to a text file containing a file that specifies requirements for you entrypoint.
-    image_directory: str
-        Relative path to a folder containing images.
-    use_cache: bool
-        Speeds up computations and saves tokens when running the same prompt multiple times by caching the LLM response.
-    verbose : bool
-        Flag indicating whether to enable verbose logging.
-    skip_file_selection: bool
-        Skip interactive file selection in improve mode and use the generated TOML file directly
-    no_execution: bool
-        Run setup but to not call LLM or write any code. For testing purposes.
-    sysinfo: bool
-        Flag indicating whether to output system information for debugging.
-    diff_timeout: int
-        Timeout used when searching diffs in improve mode.
-    gui: bool
-        Launch the graphical interface instead of the CLI.
-
-    Returns
-    -------
-    None
-    """
-
     if debug:
         import pdb
-
         sys.excepthook = lambda *_: pdb.pm()
 
     if sysinfo:
@@ -461,12 +352,10 @@ def main(
         run_gui(project_path)
         raise typer.Exit()
 
-    # Validate arguments
     if improve_mode and (clarify_mode or lite_mode):
         typer.echo("Error: Clarify and lite mode are not compatible with improve mode.")
         raise typer.Exit(code=1)
 
-    # Set up logging
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
     if use_cache:
         set_llm_cache(SQLiteCache(database_path=".langchain.db"))
@@ -501,16 +390,13 @@ def main(
         from gpt_engineer.applications.service_generator.api_automator import (
             generate_microservice,
         )
-
         generate_microservice(path, prompt.text)
         print(f"Microservice files created in {path}")
         return
 
-    # todo: if ai.vision is false and not llm_via_clipboard - ask if they would like to use gpt-4-vision-preview instead? If so recreate AI
     if not ai.vision:
         prompt.image_urls = None
 
-    # configure generation function
     if clarify_mode:
         code_gen_fn = clarified_gen
     elif lite_mode:
@@ -518,7 +404,6 @@ def main(
     else:
         code_gen_fn = gen_code
 
-    # configure execution function
     if self_heal_mode:
         execution_fn = self_heal
     else:
@@ -548,11 +433,8 @@ def main(
             files_dict_before, is_linting = FileSelector(project_path).ask_for_files(
                 skip_file_selection=skip_file_selection
             )
-
-            # lint the code
             if is_linting:
                 files_dict_before = files.linting(files_dict_before)
-
             files_dict = handle_improve_mode(
                 prompt, agent, memory, files_dict_before, diff_timeout=diff_timeout
             )
@@ -560,24 +442,19 @@ def main(
                 print(
                     f"No changes applied. Could you please upload the debug_log_file.txt in {memory.path}/logs folder in a github issue?"
                 )
-
             else:
                 print("\nChanges to be made:")
                 compare(files_dict_before, files_dict)
-
                 print()
                 print(colored("Do you want to apply these changes?", "light_green"))
                 if not prompt_yesno():
                     files_dict = files_dict_before
-
         else:
             files_dict = agent.init(prompt)
-            # collect user feedback if user consents
             config = (code_gen_fn.__name__, execution_fn.__name__)
             collect_and_send_human_review(prompt, model, temperature, config, memory)
 
         stage_uncommitted_to_git(path, files_dict, improve_mode)
-
         files.push(files_dict)
 
     if ai.token_usage_log.is_openai_model():

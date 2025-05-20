@@ -32,7 +32,6 @@ ImproveType = TypeVar(
     "ImproveType", bound=Callable[[AI, str, FilesDict, BaseMemory], FilesDict]
 )
 
-
 class CliAgent(BaseAgent):
     """
     The `CliAgent` class is responsible for managing the lifecycle of code generation and improvement
@@ -98,15 +97,15 @@ class CliAgent(BaseAgent):
         self.process_code_fn = process_code_fn
         self.improve_fn = improve_fn
         self.preprompts_holder = preprompts_holder or PrepromptsHolder(PREPROMPTS_PATH)
-        self.update_callback: Callable[[str], None] | None = None
+        self._update_callback: Optional[Callable[[str], None]] = None
 
     def set_update_callback(self, callback: Callable[[str], None]) -> None:
         """Register a callback for status updates."""
-        self.update_callback = callback
+        self._update_callback = callback
 
-    def _notify(self, message: str) -> None:
-        if self.update_callback:
-            self.update_callback(message)
+    def _send_update(self, message: str) -> None:
+        if self._update_callback:
+            self._update_callback(message)
 
     @classmethod
     def with_default_config(
@@ -123,30 +122,6 @@ class CliAgent(BaseAgent):
         """
         Creates a new instance of CliAgent with default configurations for memory, execution environment,
         AI, and other functional parameters.
-
-        Parameters
-        ----------
-        memory : DiskMemory
-            An instance of DiskMemory for storing and retrieving information.
-        execution_env : DiskExecutionEnv
-            An instance of DiskExecutionEnv for executing code.
-        ai : AI, optional
-            An instance of AI for interacting with the language model. Defaults to None, which will create
-            a new AI instance.
-        code_gen_fn : CodeGenType, optional
-            A function for generating code. Defaults to `gen_code`.
-        improve_fn : ImproveType, optional
-            A function for improving code. Defaults to `improve`.
-        process_code_fn : CodeProcessor, optional
-            A function for processing code. Defaults to `execute_entrypoint`.
-        preprompts_holder : PrepromptsHolder, optional
-            An instance of PrepromptsHolder for managing preprompt templates. Defaults to None, which will
-            create a new PrepromptsHolder instance using PREPROMPTS_PATH.
-
-        Returns
-        -------
-        CliAgent
-            An instance of CliAgent configured with the provided or default parameters.
         """
         if not isinstance(memory, DiskMemory):
             raise TypeError("memory must be an instance of DiskMemory")
@@ -166,19 +141,8 @@ class CliAgent(BaseAgent):
     def init(self, prompt: Prompt) -> FilesDict:
         """
         Generates a new piece of code using the AI and step bundle based on the provided prompt.
-
-        Parameters
-        ----------
-        prompt : str
-            A string prompt that guides the code generation process.
-
-        Returns
-        -------
-        FilesDict
-            An instance of the `FilesDict` class containing the generated code.
         """
-
-        self._notify("Generating code...")
+        self._send_update("init_start")
         files_dict = self.code_gen_fn(
             self.ai, prompt, self.memory, self.preprompts_holder
         )
@@ -195,7 +159,7 @@ class CliAgent(BaseAgent):
             prompt=prompt,
             memory=self.memory,
         )
-        self._notify("Generation complete")
+        self._send_update("init_end")
         return files_dict
 
     def improve(
@@ -207,23 +171,8 @@ class CliAgent(BaseAgent):
     ) -> FilesDict:
         """
         Improves an existing piece of code using the AI and step bundle based on the provided prompt.
-
-        Parameters
-        ----------
-        files_dict : FilesDict
-            An instance of `FilesDict` containing the code to be improved.
-        prompt : str
-            A string prompt that guides the code improvement process.
-        execution_command : str, optional
-            An optional command to execute the code. If not provided, the default execution command is used.
-
-        Returns
-        -------
-        FilesDict
-            An instance of the `FilesDict` class containing the improved code.
         """
-
-        self._notify("Improving code...")
+        self._send_update("improve_start")
         files_dict = self.improve_fn(
             self.ai,
             prompt,
@@ -232,19 +181,5 @@ class CliAgent(BaseAgent):
             self.preprompts_holder,
             diff_timeout=diff_timeout,
         )
-        # entrypoint = gen_entrypoint(
-        #     self.ai, prompt, files_dict, self.memory, self.preprompts_holder
-        # )
-        # combined_dict = {**files_dict, **entrypoint}
-        # files_dict = FilesDict(combined_dict)
-        # files_dict = self.process_code_fn(
-        #     self.ai,
-        #     self.execution_env,
-        #     files_dict,
-        #     preprompts_holder=self.preprompts_holder,
-        #     prompt=prompt,
-        #     memory=self.memory,
-        # )
-
-        self._notify("Improvement complete")
+        self._send_update("improve_end")
         return files_dict
