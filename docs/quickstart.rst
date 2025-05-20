@@ -60,6 +60,17 @@ Improve Existing Code
 
     $ gpte projects/my-old-project -i
 
+Launch the GUI
+--------------
+
+You can start ``gpt-engineer`` with a simple windowed interface by adding the ``--gui`` flag:
+
+.. code-block:: console
+
+    $ gpte <project_dir> --gui
+
+The GUI lets you edit the prompt, pick a model and start generation without using the terminal.
+
 By running ``gpt-engineer`` you agree to our `terms <./terms_link.html>`_.
 
 To **run in the browser** you can simply:
