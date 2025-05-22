@@ -1,28 +1,31 @@
 Using the GUI
-=============
+gpt-engineer provides two graphical interfaces:
 
-gpt-engineer ships with two graphical interfaces. The basic one is built with ``tkinter`` and provides a simple window for editing your prompt and running code generation. A more powerful web-based interface built with ``Flask`` exposes additional controls.
-
+A basic interface built with tkinter for prompt editing and code generation.
+An advanced web interface built with Flask offering enhanced controls and real-time logs.
 Launch
-------
-
-1. Create your project folder and add a ``prompt`` file just like when using the CLI.
-2. Run ``gpte <project_dir> --gui`` for the Tk interface or ``gpte <project_dir> --advanced-gui`` to start the web UI.
-   Use ``--advanced-gui-host`` and ``--advanced-gui-port`` to change the address.
-3. A window opens where you can adjust settings and start the generation process.
-
-Generated code will appear in ``<project_dir>/workspace`` as usual.
+Create a project folder and add a prompt file, as with CLI usage.
+Start the interface:
+For basic Tk GUI: gpte <project_dir> --gui
+For advanced web UI: gpte <project_dir> --advanced-gui
+Optional: Use --advanced-gui-host and --advanced-gui-port to set bind address and port.
+The selected interface opens, allowing configuration and generation.
+Generated code will appear in <project_dir>/workspace.
 
 Capabilities
-------------
-
-- View or edit the loaded prompt before running.
-- Toggle improve mode or standard generation.
-- Set model name and temperature.
-- Start and stop the run from the interface while monitoring logs.
-
+View and edit the prompt before execution.
+Toggle between improve mode and standard generation.
+Set model name and temperature.
+Start/stop generation and monitor logs from the interface.
+Generate boilerplate microservices via the Generate Microservice button.
 Advanced GUI
-------------
+Exposes additional controls for model selection, temperature, microservice generation, and self-healing.
+Built-in help panel explains each option.
+Logs update in real time during agent execution.
+Run button is disabled while generation is active; status indicator shows agent activity.
+Critical points:
 
-The advanced web interface adds controls for model selection, temperature, microservice generation and self-healing. A help panel explains each option and logs update in real time while the agent runs.
-The Run button is automatically disabled while generation is in progress and a status indicator shows when the agent is busy.
+Only start one interface per project directory to avoid state conflicts.
+Always verify <project_dir>/workspace for output and rollback if generation fails.
+For web UI, ensure chosen host/port are not already in use to prevent startup errors.
+If the interface fails or becomes unresponsive, terminate the process and restart it after verifying no orphaned processes remain.

@@ -12,6 +12,8 @@ $ gpte my_service --microservice
 
 The command will read the prompt file and create `app.py`, `Dockerfile` and `requirements.txt` inside the project directory.
 
+If your prompt includes a port number using the word ``port`` (e.g. ``return 'pong' at /ping port 8080``) the generated service will listen on that port.
+
 ## GUI Usage
 
 Run the Tkinter GUI and click **Generate Microservice**. You will be prompted for the output directory and the prompt text.

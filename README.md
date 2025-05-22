@@ -68,6 +68,7 @@ Check the [Windows README](./WINDOWS_README.md) for Windows usage.
 - Create a folder with a `prompt` describing the API
 - Run `gpte <project_dir> --microservice`
 - The command writes a `Dockerfile`, `app.py` and `requirements.txt` into the directory
+- If the prompt mentions a port number using the word "port", the service will listen on that port
 - 
 ### Benchmark custom agents
 - gpt-engineer installs the binary 'bench', which gives you a simple interface for benchmarking your own agent implementations against popular public datasets.
