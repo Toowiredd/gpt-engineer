@@ -42,6 +42,7 @@ from termcolor import colored
 from gpt_engineer.applications.cli.cli_agent import CliAgent
 from gpt_engineer.applications.cli.collect import collect_and_send_human_review
 from gpt_engineer.applications.cli.file_selector import FileSelector
+from gpt_engineer.applications.gui.advanced_gui import run as run_advanced_gui
 from gpt_engineer.applications.gui.main import run as run_gui
 from gpt_engineer.core.ai import AI, ClipboardAI
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
@@ -296,6 +297,21 @@ def main(
         "-g",
         help="Launch the graphical interface instead of running in the console.",
     ),
+    advanced_gui: bool = typer.Option(
+        False,
+        "--advanced-gui",
+        help="Launch the advanced web interface instead of running in the console.",
+    ),
+    advanced_gui_host: str = typer.Option(
+        "127.0.0.1",
+        "--advanced-gui-host",
+        help="Host for the advanced GUI.",
+    ),
+    advanced_gui_port: int = typer.Option(
+        5000,
+        "--advanced-gui-port",
+        help="Port for the advanced GUI.",
+    ),
     prompt_file: str = typer.Option(
         "prompt",
         "--prompt_file",
@@ -340,6 +356,7 @@ def main(
 ):
     if debug:
         import pdb
+
         sys.excepthook = lambda *_: pdb.pm()
 
     if sysinfo:
@@ -350,6 +367,10 @@ def main(
 
     if gui:
         run_gui(project_path)
+        raise typer.Exit()
+
+    if advanced_gui:
+        run_advanced_gui(project_path, host=advanced_gui_host, port=advanced_gui_port)
         raise typer.Exit()
 
     if improve_mode and (clarify_mode or lite_mode):
@@ -390,6 +411,7 @@ def main(
         from gpt_engineer.applications.service_generator.api_automator import (
             generate_microservice,
         )
+
         generate_microservice(path, prompt.text)
         print(f"Microservice files created in {path}")
         return
