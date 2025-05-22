@@ -1,22 +1,31 @@
 Using the GUI
-=============
+gpt-engineer provides two graphical interfaces:
 
-gpt-engineer ships with a lightweight graphical interface built with ``tkinter``. It provides a simple window for editing your prompt, choosing the model and running code generation.
-
+A basic interface built with tkinter for prompt editing and code generation.
+An advanced web interface built with Flask offering enhanced controls and real-time logs.
 Launch
-------
-
-1. Create your project folder and add a ``prompt`` file just like when using the CLI.
-2. Run ``gpte <project_dir> --gui``.
-3. A window opens where you can adjust settings and start the generation process.
-
-Generated code will appear in ``<project_dir>/workspace`` as usual.
+Create a project folder and add a prompt file, as with CLI usage.
+Start the interface:
+For basic Tk GUI: gpte <project_dir> --gui
+For advanced web UI: gpte <project_dir> --advanced-gui
+Optional: Use --advanced-gui-host and --advanced-gui-port to set bind address and port.
+The selected interface opens, allowing configuration and generation.
+Generated code will appear in <project_dir>/workspace.
 
 Capabilities
-------------
+View and edit the prompt before execution.
+Toggle between improve mode and standard generation.
+Set model name and temperature.
+Start/stop generation and monitor logs from the interface.
+Generate boilerplate microservices via the Generate Microservice button.
+Advanced GUI
+Exposes additional controls for model selection, temperature, microservice generation, and self-healing.
+Built-in help panel explains each option.
+Logs update in real time during agent execution.
+Run button is disabled while generation is active; status indicator shows agent activity.
+Critical points:
 
-- View or edit the loaded prompt before running.
-- Toggle improve mode or standard generation.
-- Set model name and temperature.
-- Start and stop the run from the interface while monitoring logs.
-- Generate a boilerplate microservice via the **Generate Microservice** button.
+Only start one interface per project directory to avoid state conflicts.
+Always verify <project_dir>/workspace for output and rollback if generation fails.
+For web UI, ensure chosen host/port are not already in use to prevent startup errors.
+If the interface fails or becomes unresponsive, terminate the process and restart it after verifying no orphaned processes remain.
