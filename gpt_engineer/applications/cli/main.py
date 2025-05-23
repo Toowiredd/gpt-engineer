@@ -261,6 +261,16 @@ def main(
         "-sh",
         help="Self-heal mode - fix the code by itself when it fails.",
     ),
+    smol_swarm: bool = typer.Option(
+        False,
+        "--smol-swarm",
+        help="Use a swarm of SimpleAgents to execute micro-steps in parallel.",
+    ),
+    swarm_steps: str = typer.Option(
+        "",
+        "--swarm-steps",
+        help="Semicolon separated list of steps for the smol swarm.",
+    ),
     microservice: bool = typer.Option(
         False,
         "--microservice",
@@ -450,7 +460,11 @@ def main(
                 if not prompt_yesno():
                     files_dict = files_dict_before
         else:
-            files_dict = agent.init(prompt)
+            if smol_swarm:
+                steps = [s.strip() for s in swarm_steps.split(";") if s.strip()]
+                files_dict = agent.run_swarm(prompt, steps)
+            else:
+                files_dict = agent.init(prompt)
             config = (code_gen_fn.__name__, execution_fn.__name__)
             collect_and_send_human_review(prompt, model, temperature, config, memory)
 

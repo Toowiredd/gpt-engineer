@@ -68,6 +68,12 @@ Check the [Windows README](./WINDOWS_README.md) for Windows usage.
 - Create a folder with a `prompt` describing the API
 - Run `gpte <project_dir> --microservice`
 - The command writes a `Dockerfile`, `app.py` and `requirements.txt` into the directory
+
+### Run a smol swarm
+
+- Define micro steps separated by semicolons: `--swarm-steps "setup env;write tests;implement"`
+- Run `gpte <project_dir> --smol-swarm --swarm-steps "setup env;write tests;implement"`
+- Each step is executed by a separate agent in parallel and results are merged
 - 
 ### Benchmark custom agents
 - gpt-engineer installs the binary 'bench', which gives you a simple interface for benchmarking your own agent implementations against popular public datasets.

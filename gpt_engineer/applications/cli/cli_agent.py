@@ -11,6 +11,7 @@ from gpt_engineer.core.ai import AI
 from gpt_engineer.core.base_agent import BaseAgent
 from gpt_engineer.core.base_execution_env import BaseExecutionEnv
 from gpt_engineer.core.base_memory import BaseMemory
+from gpt_engineer.agent_swarms import run_task_swarm
 from gpt_engineer.core.default.disk_execution_env import DiskExecutionEnv
 from gpt_engineer.core.default.disk_memory import DiskMemory
 from gpt_engineer.core.default.paths import PREPROMPTS_PATH
@@ -182,4 +183,11 @@ class CliAgent(BaseAgent):
             diff_timeout=diff_timeout,
         )
         self._send_update("improve_end")
+        return files_dict
+
+    def run_swarm(self, prompt: Prompt, steps: List[str]) -> FilesDict:
+        """Execute a task using a swarm of ``SimpleAgent`` instances."""
+        self._send_update("swarm_start")
+        files_dict = run_task_swarm(prompt, steps)
+        self._send_update("swarm_end")
         return files_dict

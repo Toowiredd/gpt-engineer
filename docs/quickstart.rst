@@ -78,6 +78,13 @@ Generate a Microservice
 - Run ``gpte <project_dir> --microservice``
 - ``gpt-engineer`` will create ``app.py`` and ``Dockerfile`` in the folder
 
+Run a Smol Swarm
+----------------
+
+- Define micro-steps separated by semicolons using ``--swarm-steps``
+- ``gpte <project_dir> --smol-swarm --swarm-steps "setup env;write tests;implement"``
+- Tasks are executed by multiple agents in parallel and merged automatically
+
 
 By running ``gpt-engineer`` you agree to our `terms <./terms_link.html>`_.
 
